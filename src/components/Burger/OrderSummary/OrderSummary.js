@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from "../../../containers/UI/Button/Button";
+import Button from "../../UI/Button/Button";
 
 const orderSummary = (props) => {
 

@@ -7,7 +7,9 @@ const button = (props) => {
     buttonClasses.push(classes[props.buttonType]);
 
     return (
-        <button onClick={props.onClick} className={buttonClasses.join(" ")}>{props.children}</button>
+        <button disabled={props.disabled}
+                onClick={props.onClick}
+                className={buttonClasses.join(" ")}>{props.children}</button>
     );
 }
 
