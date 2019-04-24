@@ -5,8 +5,8 @@ import BuildControl from "./BuildControl/BuildControl";
 const buildControls = (props) => {
 
     const buttons = props.ingredients.map(ingredient => {
-        return <BuildControl lessButtonHandler={() => props.addIngredientHandler(ingredient.type, -1)}
-                             moreButtonHandler={() => props.addIngredientHandler(ingredient.type, 1)}
+        return <BuildControl lessButtonHandler={() => props.addIngredientHandler({type: ingredient.type, amount: -1})}
+                             moreButtonHandler={() => props.addIngredientHandler({type: ingredient.type, amount: 1})}
                              lessDisabled={ingredient.amount <= 0}
                              key={ingredient.type}
                              label={`${ingredient.label} ${ingredient.price}$`}></BuildControl>;

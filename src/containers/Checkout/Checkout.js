@@ -2,20 +2,12 @@ import React from "react";
 import CheckoutSummary from "../../components/Order/CheckoutSummary/CheckoutSummary";
 import {Route} from "react-router";
 import ContactData from "./ContactData/ContactData";
+import {connect} from "react-redux";
 
 class Checkout extends React.Component {
 
-    state = {
-        ingredients: [],
-    }
-
     componentDidMount() {
-        const query = new URLSearchParams(this.props.location.search);
-        let ingredients = JSON.parse(query.get("ingredients"));
 
-        if (Array.isArray(ingredients)) {
-            this.setState({ingredients});
-        }
     }
 
     onCheckoutCancel = () =>  {
@@ -30,16 +22,26 @@ class Checkout extends React.Component {
 
         return (
             <div>
-                <CheckoutSummary ingredients={this.state.ingredients}
+                <CheckoutSummary ingredients={this.props.igredients}
                                  onCancel={this.onCheckoutCancel}
                                  onContinue={this.onCheckoutContinue}></CheckoutSummary>
                 <Route path={`${this.props.match.path}/contact-data`}
-                       render={(props) => (<ContactData
-                           ingredients={this.state.ingredients}
-                           {...props}></ContactData>)}></Route>
+                       render={(props) => (<ContactData></ContactData>)}></Route>
             </div>
         );
     }
 }
 
-export default Checkout;
+const mapStateToProps = (reducerState) => {
+    return {
+        igredients: reducerState.burgerBuilder.igredients,
+        totalPrice: reducerState.burgerBuilder.totalPrice,
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Checkout);
