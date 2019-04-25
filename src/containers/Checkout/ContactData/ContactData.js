@@ -5,6 +5,9 @@ import axios from "../../../axios-orders";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
 import {connect} from "react-redux";
+import {postOrder} from "../../../store/actions/order";
+import withErrorHandler from "../../../hoc/WithErrorHandler/WithErrorHandler";
+import {Redirect} from "react-router";
 
 class ContactData extends React.Component {
 
@@ -87,7 +90,6 @@ class ContactData extends React.Component {
                 valid: null,
             },
         },
-        orderSending: false,
     }
 
     componentDidMount() {
@@ -133,7 +135,7 @@ class ContactData extends React.Component {
         event.preventDefault();
 
         const order = {
-            igredients: this.props.ingredients,
+            igredients: this.props.igredients,
             customer: {
                 name: this.state.orderForm.name.value,
                 email: this.state.orderForm.email.value,
@@ -146,15 +148,7 @@ class ContactData extends React.Component {
             deliveryMethod: this.state.orderForm.value
         };
 
-        this.setState({orderSending: true});
-
-        axios.post("/orders.json", order)
-            .then(response => {
-                this.setState({orderSending: false});
-                this.props.history.push("/builder");
-            })
-            .catch(error => console.log(error))
-            .finally(() => void 0);
+        this.props.postOrder(order);
     }
 
     inputChanged = (key, event) => {
@@ -168,11 +162,19 @@ class ContactData extends React.Component {
         this.setState({orderForm});
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+    }
+
     render() {
 
         let form = null;
 
-        if (this.state.orderSending) {
+        if (this.props.postOrderStatus === 'SUCCESS') {
+            return (<Redirect to={"/builder"}/>);
+        }
+
+        if (this.props.postOrderStatus === 'STARTED') {
             form = <Spinner></Spinner>
         } else {
 
@@ -209,7 +211,15 @@ const mapStateToProps = (reducerState) => {
     return {
         igredients: reducerState.burgerBuilder.igredients,
         totalPrice: reducerState.burgerBuilder.totalPrice,
+        postOrderStatus: reducerState.orders.postOrderStatus,
+        postOrderError: reducerState.orders.postOrderError,
     }
 }
 
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        postOrder: (payload) => dispatch(postOrder(payload)),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));

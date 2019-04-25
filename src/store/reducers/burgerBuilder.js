@@ -1,9 +1,10 @@
 import {START_PRICE} from "../../containers/BurgerBuilder/BurgerBuilder";
-import {ADD_INGREDIENT, SET_INGREDIENT} from "../actionsEnum";
+import {ADD_INGREDIENT, FETCH_INGREDIENTS_FAILED, SET_INGREDIENT} from "../actions/actionsEnum";
 
 const initialState = {
-    igredients: [],
+    igredients: null,
     totalPrice: START_PRICE,
+    error: false
 };
 
 const safeSubtraction = (a, b) => {
@@ -11,42 +12,42 @@ const safeSubtraction = (a, b) => {
     return result < 0 ? 0 : result;
 }
 
-const actions = new Map();
-
-/**
- * amount - negatives are allowed
- * */
-actions.set(ADD_INGREDIENT, (state, payload) => {
-    const igredients = state.igredients.map(igredient => {
-        //ingredients amount can not be negative
-        if (igredient.type === payload.type) {
-            return Object.assign({}, igredient,
-                {amount: safeSubtraction(igredient.amount, payload.amount)});
-        } else {
-            return igredient;
-        }
-    });
-
-    const totalPrice = igredients.reduce(
-        (prev, current) => prev + current.price * current.amount,
-        START_PRICE
-    );
-
-    return Object.assign({}, state, {igredients, totalPrice});
-});
-
-actions.set(SET_INGREDIENT, (state, igredients) => {
-    return Object.assign({}, state, {igredients});
-});
-
 const reducer = (currentState = initialState, action) => {
-    const actionFunction = actions.get(action.type);
 
-    if (actionFunction) {
-        return actionFunction(currentState, action.payload);
-    } else {
-        return currentState;
+    switch (action.type) {
+        case SET_INGREDIENT: {
+            return Object.assign({}, currentState, {
+                igredients: action.payload,
+                totalPrice: START_PRICE,
+            });
+        }
+        case ADD_INGREDIENT: {
+            //amount - negatives are allowed
+            const igredients = currentState.igredients.map(ingredient => {
+                //ingredients amount can not be negative
+                if (ingredient.type === action.payload.type) {
+                    return Object.assign({}, ingredient,
+                        {amount: safeSubtraction(ingredient.amount, action.payload.amount)});
+                } else {
+                    return ingredient;
+                }
+            });
+
+            const totalPrice = igredients.reduce(
+                (prev, current) => prev + current.price * current.amount,
+                START_PRICE
+            );
+
+            return Object.assign({}, currentState, {igredients, totalPrice, error: false});
+        }
+        case FETCH_INGREDIENTS_FAILED: {
+            return Object.assign({}, currentState, {error: true});
+        }
+        default: {
+            return currentState;
+        }
     }
+
 }
 
 export default reducer;

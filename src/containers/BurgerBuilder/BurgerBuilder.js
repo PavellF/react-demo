@@ -7,7 +7,7 @@ import axios from '../../axios-orders.js';
 import Spinner from "../../components/UI/Spinner/Spinner";
 import withErrorHandler from "../../hoc/WithErrorHandler/WithErrorHandler";
 import {connect} from "react-redux";
-import {ADD_INGREDIENT, SET_INGREDIENT} from "../../store/actionsEnum";
+import {addIngredient, fetchIngredients} from "../../store/actions/burgerBuilder";
 
 export const START_PRICE = 4;
 
@@ -17,27 +17,11 @@ class BurgerBuilder extends Component {
         super(props);
         this.state = {
             modalActive: false,
-            igredientsLoading: false,
-            error: false
         };
     }
 
     componentDidMount() {
-        this.setState({igredientsLoading: true});
-        axios.get("ingredients.json").then(response => {
-            //const response1 = response.data;
-            this.props.setIngredients([
-                {type: "Salad", label: "Salad", amount: 0, price: 2},
-                {type: "Bacon", label: "Bacon", amount: 0, price: 9},
-                {type: "Cheese", label: "Cheese", amount: 0, price: 7},
-                {type: "Meat", label: "Meat", amount: 0, price: 5},
-            ]);
-            this.setState({
-                igredientsLoading: false
-            });
-        }).catch(error => {
-            this.setState({error: true, igredientsLoading: false})
-        });
+        this.props.onFetchIngredients();
     }
 
     orderHandler = () => {
@@ -54,20 +38,16 @@ class BurgerBuilder extends Component {
 
     render() {
 
-        let modalInner = (<OrderSummary ingredients={this.props.igredients}
-                                        totalPrice={this.props.totalPrice}
-                                        cancelHandler={this.orderHandler}
-                                        continueHandler={this.confirmOrderHandler}></OrderSummary>);
-
+        let modalInner = null;
         let ingredientsList = null;
 
-        if (this.state.igredientsLoading) {
+        if (this.props.igredients === null) {
             ingredientsList = (
                 <div style={{paddingTop: "3rem"}}>
                     <Spinner/>
                 </div>
             );
-        } else if (this.state.error) {
+        } else if (this.props.error) {
             ingredientsList = (
                 <p>Failed load application</p>
             );
@@ -82,6 +62,10 @@ class BurgerBuilder extends Component {
                         totalPrice={this.props.totalPrice}> </BuildControls>
                 </React.Fragment>
             );
+            modalInner = (<OrderSummary ingredients={this.props.igredients}
+                                        totalPrice={this.props.totalPrice}
+                                        cancelHandler={this.orderHandler}
+                                        continueHandler={this.confirmOrderHandler}></OrderSummary>);
         }
 
         return (
@@ -101,13 +85,14 @@ const mapStateToProps = (reducerState) => {
     return {
         igredients: reducerState.burgerBuilder.igredients,
         totalPrice: reducerState.burgerBuilder.totalPrice,
+        error: reducerState.burgerBuilder.error,
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onAddIngredient: (payload) => dispatch({type: ADD_INGREDIENT, payload}),
-        setIngredients: (payload) => dispatch({type: SET_INGREDIENT, payload}),
+        onAddIngredient: (payload) => dispatch(addIngredient(payload)),
+        onFetchIngredients: () => dispatch(fetchIngredients()),
     }
 }
 

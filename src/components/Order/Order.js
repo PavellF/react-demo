@@ -7,7 +7,8 @@ const order = (props) => {
     const ingredients = props.order.igredients || [];
     const ingredientsFiltered = ingredients.filter(i => i.amount > 0);
 
-    const sum = ingredientsFiltered.reduce((prev, current) => prev + current.price, 0);
+    const sum = ingredientsFiltered
+        .reduce((prev, current) => prev + (current.price * current.amount), 0);
     const ingredientsList = ingredientsFiltered.map(i => (
         <span key={i.name} style={{textTransform: 'capitalize',
         display: "inline-block", margin: '0 8px', border: '1px solid #ccc', padding: '5px'}}
@@ -22,4 +23,4 @@ const order = (props) => {
     );
 }
 
-export default order;//TODO github
+export default order;
