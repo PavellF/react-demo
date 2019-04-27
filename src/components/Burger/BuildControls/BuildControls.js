@@ -14,12 +14,21 @@ const buildControls = (props) => {
 
     const overallAdded = props.ingredients.reduce((prev, current) => prev + current.amount, 0);
 
+    let orderButton;
+
+    if (props.isAuth) {
+        orderButton = <button disabled={overallAdded === 0} className={classes.OrderButton}
+                              onClick={props.orderHandler}>ORDER NOW!!1</button>
+    } else {
+        orderButton = <button disabled={overallAdded === 0} className={classes.OrderButton}
+                              onClick={props.orderHandler}>LOG IN TO ORDER</button>
+    }
+
     return (
         <div className={classes.BuildControls}>
             <p>Current price {props.totalPrice}$</p>
             {buttons}
-            <button disabled={overallAdded === 0} className={classes.OrderButton}
-                    onClick={props.orderHandler}>ORDER NOW!!1</button>
+            {orderButton}
         </div>
     );
 }

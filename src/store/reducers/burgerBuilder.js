@@ -4,7 +4,8 @@ import {ADD_INGREDIENT, FETCH_INGREDIENTS_FAILED, SET_INGREDIENT} from "../actio
 const initialState = {
     igredients: null,
     totalPrice: START_PRICE,
-    error: false
+    error: false,
+    buildingIsActive: false,
 };
 
 const safeSubtraction = (a, b) => {
@@ -19,6 +20,7 @@ const reducer = (currentState = initialState, action) => {
             return Object.assign({}, currentState, {
                 igredients: action.payload,
                 totalPrice: START_PRICE,
+                buildingIsActive: false
             });
         }
         case ADD_INGREDIENT: {
@@ -38,10 +40,15 @@ const reducer = (currentState = initialState, action) => {
                 START_PRICE
             );
 
-            return Object.assign({}, currentState, {igredients, totalPrice, error: false});
+            return Object.assign({}, currentState, {
+                igredients,
+                totalPrice,
+                error: false,
+                buildingIsActive: true
+            });
         }
         case FETCH_INGREDIENTS_FAILED: {
-            return Object.assign({}, currentState, {error: true});
+            return Object.assign({}, currentState, {error: true, buildingIsActive: false});
         }
         default: {
             return currentState;

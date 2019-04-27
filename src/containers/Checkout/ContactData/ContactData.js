@@ -8,6 +8,7 @@ import {connect} from "react-redux";
 import {postOrder} from "../../../store/actions/order";
 import withErrorHandler from "../../../hoc/WithErrorHandler/WithErrorHandler";
 import {Redirect} from "react-router";
+import {checkValidity, isFormValid} from "../../../shared/utility";
 
 class ContactData extends React.Component {
 
@@ -92,50 +93,12 @@ class ContactData extends React.Component {
         },
     }
 
-    componentDidMount() {
-
-    }
-
-    checkValidity = (value, rules) => {
-
-        if (rules === undefined) {
-            return true;
-        }
-
-        let isValid = true;
-
-        if (rules.required) {
-            isValid = value.trim() != "" && isValid;
-        }
-
-        if (rules.min !== undefined) {
-            isValid = value.trim().length >= rules.min && isValid;
-        }
-
-        if (rules.max !== undefined) {
-            isValid = value.trim().length <= rules.max && isValid;
-        }
-
-        return isValid;
-    }
-
-    isFormValid = () => {
-        const values = Object.values(this.state.orderForm);
-
-        for (let formElement of values) {
-            if (!formElement.valid) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     submitOrderHandler = (event) => {
         event.preventDefault();
 
         const order = {
             igredients: this.props.igredients,
+            userId: this.props.userId,
             customer: {
                 name: this.state.orderForm.name.value,
                 email: this.state.orderForm.email.value,
@@ -148,14 +111,14 @@ class ContactData extends React.Component {
             deliveryMethod: this.state.orderForm.value
         };
 
-        this.props.postOrder(order);
+        this.props.postOrder(order, this.props.token);
     }
 
     inputChanged = (key, event) => {
 
         const updatedInput = Object.assign({}, this.state.orderForm[key], {
             value: event.target.value,
-            valid: this.checkValidity(event.target.value, this.state.orderForm[key].validation)
+            valid: checkValidity(event.target.value, this.state.orderForm[key].validation)
         });
 
         const orderForm = Object.assign({}, this.state.orderForm, {[key]: updatedInput});
@@ -171,7 +134,7 @@ class ContactData extends React.Component {
         let form = null;
 
         if (this.props.postOrderStatus === 'SUCCESS') {
-            return (<Redirect to={"/builder"}/>);
+            return (<Redirect to={"/orders"}/>);
         }
 
         if (this.props.postOrderStatus === 'STARTED') {
@@ -193,7 +156,7 @@ class ContactData extends React.Component {
             form = (
                 <form onSubmit={this.submitOrderHandler}>
                     {inputs}
-                    <Button buttonType="Success" disabled={!this.isFormValid()}>ORDER</Button>
+                    <Button buttonType="Success" disabled={!isFormValid(this.state.orderForm)}>ORDER</Button>
                 </form>
             );
         }
@@ -213,12 +176,14 @@ const mapStateToProps = (reducerState) => {
         totalPrice: reducerState.burgerBuilder.totalPrice,
         postOrderStatus: reducerState.orders.postOrderStatus,
         postOrderError: reducerState.orders.postOrderError,
+        token: reducerState.auth.token,
+        userId: reducerState.auth.userId,
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        postOrder: (payload) => dispatch(postOrder(payload)),
+        postOrder: (payload, token) => dispatch(postOrder(payload, token)),
     }
 }
 

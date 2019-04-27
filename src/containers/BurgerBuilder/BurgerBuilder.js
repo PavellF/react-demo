@@ -8,6 +8,7 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import withErrorHandler from "../../hoc/WithErrorHandler/WithErrorHandler";
 import {connect} from "react-redux";
 import {addIngredient, fetchIngredients} from "../../store/actions/burgerBuilder";
+import {setAuthRedirectPath} from "../../store/actions/auth";
 
 export const START_PRICE = 4;
 
@@ -25,9 +26,16 @@ class BurgerBuilder extends Component {
     }
 
     orderHandler = () => {
-        this.setState((prevState) => {
-            return {modalActive: !prevState.modalActive};
-        });
+
+        if (this.props.authenticated) {
+            this.setState((prevState) => {
+                return {modalActive: !prevState.modalActive};
+            });
+        } else {
+            this.props.onSetRedirectPath('/auth');
+            this.props.history.push('/auth');
+        }
+
     }
 
     confirmOrderHandler = () => {
@@ -56,6 +64,7 @@ class BurgerBuilder extends Component {
                 <React.Fragment>
                     <Burger ingredients={this.props.igredients}/>
                     <BuildControls
+                        isAuth={this.props.authenticated}
                         ingredients={this.props.igredients}
                         orderHandler={this.orderHandler}
                         addIngredientHandler={this.props.onAddIngredient}
@@ -86,6 +95,7 @@ const mapStateToProps = (reducerState) => {
         igredients: reducerState.burgerBuilder.igredients,
         totalPrice: reducerState.burgerBuilder.totalPrice,
         error: reducerState.burgerBuilder.error,
+        authenticated: reducerState.auth.token !== null
     }
 }
 
@@ -93,6 +103,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onAddIngredient: (payload) => dispatch(addIngredient(payload)),
         onFetchIngredients: () => dispatch(fetchIngredients()),
+        onSetRedirectPath: (path) => dispatch(setAuthRedirectPath(path)),
     }
 }
 

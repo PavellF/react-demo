@@ -8,13 +8,14 @@ const toolbar = (props) => {
 
     return (
         <header className={classes.Toolbar}>
+
             <DrawerToggle clickHandler={props.logoClickHandler}></DrawerToggle>
             <div className={classes.Logo}>
                 <Logo></Logo>
             </div>
 
             <nav className={classes.DesktopOnly}>
-                <NavigationItems></NavigationItems>
+                <NavigationItems isAuth={props.isAuth} ></NavigationItems>
             </nav>
 
         </header>

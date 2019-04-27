@@ -8,21 +8,27 @@ import {Provider} from "react-redux";
 import {applyMiddleware, combineReducers, compose, createStore} from "redux";
 import burgerBuilder from './store/reducers/burgerBuilder'
 import orders from './store/reducers/order'
+import auth from './store/reducers/auth'
 import thunk from "redux-thunk";
 
 const rootReducer = combineReducers({
     burgerBuilder: burgerBuilder,
     orders: orders,
+    auth: auth
 });
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+let composeEnhancers = compose;
+
+if (process.env.NODE_ENV === 'development') {
+    composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
+}
 
 const loggerMiddleware = (store) => {
     return (next) => {
         return (action) => {
-            console.log("Middlevare", action);
+            //console.log("Middlevare", action);
             const result = next(action);
-            console.log("Middlevare next state", store.getState());
+            //console.log("Middlevare next state", store.getState());
             return result;
         }
     };

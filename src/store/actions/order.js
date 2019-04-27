@@ -8,9 +8,9 @@ import {
 } from "./actionsEnum";
 
 
-export const fetchOrders = () => {
+export const fetchOrders = (token, userId) => {
     return dispatch => {
-        axios.get("orders.json").then(response => {
+        axios.get(`orders.json?auth=${token}&orderBy="userId"&equalTo="${userId}"`).then(response => {
             const ordersData = Object.entries(response.data);
             const orders = [];
 
@@ -31,11 +31,11 @@ export const fetchOrders = () => {
     }
 }
 
-export const postOrder = (payload) => {
+export const postOrder = (payload, token) => {
     return dispatch => {
         dispatch({type: POST_ORDER_START});
 
-        axios.post("/orders.json", payload).then(response => {
+        axios.post(`orders.json?auth=${token}`, payload).then(response => {
             dispatch({
                 type: POST_ORDER_SUCCESS,
                 payload: {

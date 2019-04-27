@@ -17,12 +17,12 @@ const sideDrawer = (props) => {
     return (
         <React.Fragment>
             <Backdrop show={props.shown} backdropHandler={props.backdropClickHandler}></Backdrop>
-            <div className={sideDrawerClasses.join(" ")}>
+            <div className={sideDrawerClasses.join(" ")} onClick={props.backdropClickHandler}>
                 <div className={classes.Logo}>
                     <Logo></Logo>
                 </div>
                 <nav>
-                    <NavigationItems></NavigationItems>
+                    <NavigationItems isAuth={props.isAuth}></NavigationItems>
                 </nav>
             </div>
         </React.Fragment>
