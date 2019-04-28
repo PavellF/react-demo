@@ -12,7 +12,7 @@ import {setAuthRedirectPath} from "../../store/actions/auth";
 
 export const START_PRICE = 4;
 
-class BurgerBuilder extends Component {
+export class BurgerBuilder extends Component {
 
     constructor(props) {
         super(props);
