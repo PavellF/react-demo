@@ -11,39 +11,39 @@ const AsyncCheckout = React.lazy(() => import('./containers/Checkout/Checkout'))
 const AsyncOrders = React.lazy(() => import("./containers/Orders/Orders"));
 const AsyncAuth = React.lazy(() => import("./containers/Auth/Auth"));
 
-class App extends Component {
-    render() {
-        this.props.autoAuth();
+const App = props => {
 
-        if (this.props.authenticated) {
-            return (
-                <div className="App">
-                    <Layout>
-                        <Switch>
-                            <Route component={BurgerBuilder} path={"/builder"}></Route>
-                            <Route component={WaitingComponent(AsyncCheckout)} path={"/checkout"}></Route>
-                            <Route component={WaitingComponent(AsyncOrders)} path={"/orders"}></Route>
-                            <Route component={WaitingComponent(AsyncAuth)} path={"/auth"}/>
-                            <Route component={Logout} path={"/logout"}/>
-                            <Redirect to={"/builder"}/>
-                        </Switch>
-                    </Layout>
-                </div>
-            );
-        } else {
-            return (
-                <div className="App">
-                    <Layout>
-                        <Switch>
-                            <Route component={BurgerBuilder} path={"/builder"}></Route>
-                            <Route component={WaitingComponent(AsyncAuth)} path={"/auth"}/>
-                            <Redirect to={"/builder"}/>
-                        </Switch>
-                    </Layout>
-                </div>
-            );
-        }
+    props.autoAuth();
+
+    if (props.authenticated) {
+        return (
+            <div className="App">
+                <Layout>
+                    <Switch>
+                        <Route component={BurgerBuilder} path={"/builder"}></Route>
+                        <Route component={WaitingComponent(AsyncCheckout)} path={"/checkout"}></Route>
+                        <Route component={WaitingComponent(AsyncOrders)} path={"/orders"}></Route>
+                        <Route component={WaitingComponent(AsyncAuth)} path={"/auth"}/>
+                        <Route component={Logout} path={"/logout"}/>
+                        <Redirect to={"/builder"}/>
+                    </Switch>
+                </Layout>
+            </div>
+        );
+    } else {
+        return (
+            <div className="App">
+                <Layout>
+                    <Switch>
+                        <Route component={BurgerBuilder} path={"/builder"}></Route>
+                        <Route component={WaitingComponent(AsyncAuth)} path={"/auth"}/>
+                        <Redirect to={"/builder"}/>
+                    </Switch>
+                </Layout>
+            </div>
+        );
     }
+
 }
 
 const mapStateToProps = (reducerState) => {

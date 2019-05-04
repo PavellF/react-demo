@@ -1,33 +1,28 @@
-import React from 'react';
+import React, {useState} from 'react';
 import classes from './Layout.module.css'
 import Toolbar from "../Navigation/Toolbar/Toolbar";
 import SideDrawer from "../Navigation/SideDrawer/SideDrawer";
 import {connect} from "react-redux";
 
-class Layout extends React.Component {
+const Layout = (props) => {
 
-    state = {
-        showSideDrawer: false
+    const [showSideDrawer, setShowSideDrawer] = useState(false);
+
+    const showSideDrawerHandler = () => {
+        setShowSideDrawer(prev => !prev);
     }
 
-    showSideDrawer = () =>  {
-        this.setState(prev => {
-            return {showSideDrawer: !prev.showSideDrawer};
-        });
-    }
+    return (
+        <React.Fragment>
+            <SideDrawer isAuth={props.isAuthenticated} shown={showSideDrawer}
+                        backdropClickHandler={showSideDrawerHandler}></SideDrawer>
+            <Toolbar isAuth={props.isAuthenticated} logoClickHandler={showSideDrawerHandler}></Toolbar>
+            <main className={classes.Content}>
+                {props.children}
+            </main>
+        </React.Fragment>
+    );
 
-    render() {
-
-        return (
-            <React.Fragment>
-                <SideDrawer isAuth={this.props.isAuthenticated} shown={this.state.showSideDrawer} backdropClickHandler={this.showSideDrawer}></SideDrawer>
-                <Toolbar isAuth={this.props.isAuthenticated} logoClickHandler={this.showSideDrawer}></Toolbar>
-                <main className={classes.Content}>
-                    {this.props.children}
-                </main>
-            </React.Fragment>
-        );
-    }
 }
 
 const mapStateToProps = (reducerState) => {
@@ -37,9 +32,7 @@ const mapStateToProps = (reducerState) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return {
-
-    }
+    return {}
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);

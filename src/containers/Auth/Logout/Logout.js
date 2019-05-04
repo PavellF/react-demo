@@ -1,20 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {connect} from "react-redux";
 import {logout} from "../../../store/actions/auth";
 import {Redirect} from "react-router";
 
-class Logout extends React.Component {
+const Logout = props => {
 
-    componentDidMount() {
-        this.props.doLogout();
-    }
+    useEffect(() => {
+        props.doLogout();
+    }, []);
 
-    render() {
-
-        return (
-          <Redirect to={"/builder"}/>
-        );
-    }
+    return (<Redirect to={"/builder"}/>);
 }
 
 const mapStateToProps = (reducerState) => {

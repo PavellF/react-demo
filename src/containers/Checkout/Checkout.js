@@ -4,36 +4,29 @@ import {Redirect, Route} from "react-router";
 import ContactData from "./ContactData/ContactData";
 import {connect} from "react-redux";
 
-class Checkout extends React.Component {
+const Checkout = props => {
 
-    componentDidMount() {
-
+    const onCheckoutCancel = () => {
+        props.history.goBack();
     }
 
-    onCheckoutCancel = () =>  {
-        this.props.history.goBack();
+    const onCheckoutContinue = () => {
+        props.history.replace('/checkout/contact-data');
     }
 
-    onCheckoutContinue = () => {
-        this.props.history.replace('/checkout/contact-data');
+    if (props.igredients === null) {
+        return (<Redirect to={"/builder"}/>);
     }
 
-    render() {
-
-        if (this.props.igredients === null) {
-            return (<Redirect to={"/builder"} />);
-        }
-
-        return (
-            <div>
-                <CheckoutSummary ingredients={this.props.igredients}
-                                 onCancel={this.onCheckoutCancel}
-                                 onContinue={this.onCheckoutContinue}></CheckoutSummary>
-                <Route path={`${this.props.match.path}/contact-data`}
-                       render={(props) => (<ContactData></ContactData>)}></Route>
-            </div>
-        );
-    }
+    return (
+        <div>
+            <CheckoutSummary ingredients={props.igredients}
+                             onCancel={onCheckoutCancel}
+                             onContinue={onCheckoutContinue}></CheckoutSummary>
+            <Route path={`${props.match.path}/contact-data`}
+                   render={(props) => (<ContactData></ContactData>)}></Route>
+        </div>
+    );
 }
 
 const mapStateToProps = (reducerState) => {
@@ -44,8 +37,7 @@ const mapStateToProps = (reducerState) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return {
-    }
+    return {}
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Checkout);

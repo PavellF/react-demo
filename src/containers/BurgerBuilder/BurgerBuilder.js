@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState, useEffect} from 'react';
 import Burger from "../../components/Burger/Burger";
 import BuildControls from "../../components/Burger/BuildControls/BuildControls";
 import Modal from "../../components/UI/Modal/Modal";
@@ -12,81 +12,72 @@ import {setAuthRedirectPath} from "../../store/actions/auth";
 
 export const START_PRICE = 4;
 
-export class BurgerBuilder extends Component {
+export const BurgerBuilder = (props) => {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            modalActive: false,
-        };
-    }
+    const [modalActive, setModalActive] = useState(false);
 
-    componentDidMount() {
-        this.props.onFetchIngredients();
-    }
+    useEffect(() => {
+        props.onFetchIngredients();
+    }, []);
 
-    orderHandler = () => {
+    const orderHandler = () => {
 
-        if (this.props.authenticated) {
-            this.setState((prevState) => {
-                return {modalActive: !prevState.modalActive};
-            });
+        if (props.authenticated) {
+            setModalActive(prevState => !prevState);
         } else {
-            this.props.onSetRedirectPath('/auth');
-            this.props.history.push('/auth');
+            props.onSetRedirectPath('/auth');
+            props.history.push('/auth');
         }
 
-    }
+    };
 
-    confirmOrderHandler = () => {
-        this.props.history.push({
+    const confirmOrderHandler = () => {
+        props.history.push({
             pathname: '/checkout'
         });
     }
 
-    render() {
 
-        let modalInner = null;
-        let ingredientsList = null;
+    let modalInner = null;
+    let ingredientsList = null;
 
-        if (this.props.igredients === null) {
-            ingredientsList = (
-                <div style={{paddingTop: "3rem"}}>
-                    <Spinner/>
-                </div>
-            );
-        } else if (this.props.error) {
-            ingredientsList = (
-                <p>Failed load application</p>
-            );
-        } else {
-            ingredientsList = (
-                <React.Fragment>
-                    <Burger ingredients={this.props.igredients}/>
-                    <BuildControls
-                        isAuth={this.props.authenticated}
-                        ingredients={this.props.igredients}
-                        orderHandler={this.orderHandler}
-                        addIngredientHandler={this.props.onAddIngredient}
-                        totalPrice={this.props.totalPrice}> </BuildControls>
-                </React.Fragment>
-            );
-            modalInner = (<OrderSummary ingredients={this.props.igredients}
-                                        totalPrice={this.props.totalPrice}
-                                        cancelHandler={this.orderHandler}
-                                        continueHandler={this.confirmOrderHandler}></OrderSummary>);
-        }
-
-        return (
+    if (props.igredients === null) {
+        ingredientsList = (
+            <div style={{paddingTop: "3rem"}}>
+                <Spinner/>
+            </div>
+        );
+    } else if (props.error) {
+        ingredientsList = (
+            <p>Failed load application</p>
+        );
+    } else {
+        ingredientsList = (
             <React.Fragment>
-                {ingredientsList}
-                <Modal show={this.state.modalActive}
-                       modalCloseHandler={this.orderHandler}>
-                    {modalInner}
-                </Modal>
+                <Burger ingredients={props.igredients}/>
+                <BuildControls
+                    isAuth={props.authenticated}
+                    ingredients={props.igredients}
+                    orderHandler={orderHandler}
+                    addIngredientHandler={props.onAddIngredient}
+                    totalPrice={props.totalPrice}> </BuildControls>
             </React.Fragment>
         );
+        modalInner = (<OrderSummary ingredients={props.igredients}
+                                    totalPrice={props.totalPrice}
+                                    cancelHandler={orderHandler}
+                                    continueHandler={confirmOrderHandler}></OrderSummary>);
     }
+
+    return (
+        <React.Fragment>
+            {ingredientsList}
+            <Modal show={modalActive}
+                   modalCloseHandler={orderHandler}>
+                {modalInner}
+            </Modal>
+        </React.Fragment>
+    );
 
 }
 
